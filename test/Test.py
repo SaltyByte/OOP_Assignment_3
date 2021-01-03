@@ -1,4 +1,4 @@
-from DiGraph import DiGraph
+from src.DiGraph import DiGraph
 
 
 def main():
