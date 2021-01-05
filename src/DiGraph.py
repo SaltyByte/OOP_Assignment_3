@@ -1,3 +1,6 @@
+from src.NodeData import NodeData
+
+
 class DiGraph:
     """This class represents a directed weighted graph with basic functions."""
 
@@ -174,14 +177,3 @@ class DiGraph:
             self.mc += 1
             self.edge_size -= 1
             return True
-
-
-class NodeData:
-    """This class represents a node data of the graph with simple functions."""
-
-    def __init__(self, key, pos=None):
-        self.key = key
-        self.pos = pos
-
-    def __str__(self) -> str:
-        return super().__str__()

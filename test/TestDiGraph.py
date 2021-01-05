@@ -1,5 +1,15 @@
 from src.DiGraph import DiGraph
+from src.GraphAlgo import GraphAlgo
+import unittest
 
+
+class TestDiGraph:
+
+
+
+
+
+    pass
 
 def main():
     graph = DiGraph()
@@ -24,9 +34,9 @@ def main():
     graph.add_edge(0, 1, 500)
 
     print("MC(13) : " + str(graph.get_mc()) + ", Node size(5) : " + str(graph.v_size()) + ", Edge size(8) : " + str(
-        graph.e_size()) + ", Edges out of 0(1{1: 10}) : " + str(graph.all_out_edges_of_node(0)))
-    print("Edges in 2(1{4: 60}) : " + str(graph.all_in_edges_of_node(2)))
-    print("Edges out of 2(3{0: 30,1: 20,3: 40}) : " + str(graph.all_out_edges_of_node(2)))
+        graph.e_size()) + ", Edges out of 0 {1: 10} : " + str(graph.all_out_edges_of_node(0)))
+    print("Edges in 2 {4: 60} : " + str(graph.all_in_edges_of_node(2)))
+    print("Edges out of 2 {0: 30,1: 20,3: 40} : " + str(graph.all_out_edges_of_node(2)))
 
     graph.remove_edge(0, 2)
     graph.remove_edge(0, 3)
@@ -40,10 +50,10 @@ def main():
     graph.remove_edge(1, 0)
 
     print("MC(16) : " + str(graph.get_mc()) + ", Edge size(5) : " + str(
-        graph.e_size()) + ", Edges out of 0(0{}) : " + str(
+        graph.e_size()) + ", Edges out of 0 {} : " + str(
         graph.all_out_edges_of_node(0)))
 
-    print("Edges out of 3(0{}): " + str(graph.all_out_edges_of_node(3)))
+    print("Edges out of 3 {}: " + str(graph.all_out_edges_of_node(3)))
     graph.remove_node(3)
 
     print("MC(20) : " + str(graph.get_mc()) + ", Edge size(2) : " + str(
@@ -51,4 +61,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    unittest.main()
