@@ -4,20 +4,20 @@ from src.DiGraph import DiGraph
 
 class TestGraphAlgo:
     graph = DiGraph()
-    graph.add_node(1)
-    graph.add_node(2)
-    graph.add_node(3)
-    graph.add_node(4)
-    graph.add_node(5)
-    graph.add_node(6)
-    graph.add_node(7)
-    graph.add_node(8)
-    graph.add_node(9)
-    graph.add_node(10)
-    graph.add_node(11)
-    graph.add_node(12)
-    graph.add_node(13)
-    graph.add_node(14)
+    graph.add_node(1, (1, 1))
+    graph.add_node(2, (2, 2))
+    graph.add_node(3, (3, 3))
+    graph.add_node(4, (4, 4))
+    graph.add_node(5, (5, 5))
+    graph.add_node(6, (6, 6))
+    graph.add_node(7, (7, 7))
+    graph.add_node(8, (8, 8))
+    graph.add_node(9, (9, 9))
+    graph.add_node(10, (10, 10))
+    graph.add_node(11, (11, 11))
+    graph.add_node(12, (12, 12))
+    graph.add_node(13, (13, 13))
+    graph.add_node(14, (14, 14))
 
     graph.add_edge(1, 2, 5)
     graph.add_edge(2, 3, 2)
@@ -45,4 +45,8 @@ class TestGraphAlgo:
     graph.add_edge(3, 9, 3.5)
 
     graph_algo = GraphAlgo(graph)
-    print(graph_algo.shortest_path(5, 12))
+
+    graph_algo.plot_graph()
+
+
+

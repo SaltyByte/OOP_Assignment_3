@@ -3,6 +3,9 @@ import heapq as q
 from src import GraphInterface
 from src.NodeData import NodeData
 from src.DiGraph import DiGraph
+import math
+import json
+import matplotlib.pyplot as plt
 
 
 class GraphAlgo:
@@ -24,12 +27,26 @@ class GraphAlgo:
         @returns True if the loading was successful, False o.w.
         """
 
+        if file_name is None:
+            return False
+
+        with open(file_name, 'r') as file:
+            self.graph = json.load(file)
+        return True
+
     def save_to_json(self, file_name: str) -> bool:
         """
         Saves the graph in JSON format to a file
         @param file_name: The path to the out file
         @return: True if the save was successful, False o.w.
         """
+
+        if file_name is None:
+            return False
+
+        with open(file_name, 'w') as file:
+            json.dump(self.graph, file, default=lambda o: o.__dict__, indent=4)
+        return True
 
     def shortest_path(self, id1: int, id2: int) -> (float, list):
         """
@@ -55,17 +72,22 @@ class GraphAlgo:
         https://en.wikipedia.org/wiki/Dijkstra's_algorithm
         """
 
-        # make full false so when we reach dest we quit
         all_nodes = self.graph.get_all_v()
         if id1 not in all_nodes or id2 not in all_nodes:
-            return float('inf'), []
+            return math.inf, []
         if id1 is id2:
             return 0, [id2]
-        distance, path = self.dijkstra(id1, id2)
-        if all_nodes[id2].tag is float('inf'):
-            return float('inf'), []
-        return distance, path
+        distance = self.dijkstra(id1, id2)
+        if all_nodes[id2].tag is math.inf:
+            return math.inf, []
 
+        node = all_nodes.get(id2)
+        shortest_path = [node]
+        while node.key is not all_nodes[id1].key:
+            node = all_nodes.get(node.parent)
+            shortest_path.append(node)
+        shortest_path.reverse()
+        return distance, shortest_path
 
     def connected_component(self, id1: int) -> list:
         """
@@ -75,12 +97,19 @@ class GraphAlgo:
         Notes:
         If the graph is None or id1 is not in the graph, the function should return an empty list []
         """
-        # make this function run one time by making the full true
-        connected = []
-        all_nodes = self.graph.get_all_v()
-        for node in all_nodes:
-            self.dijkstra()
 
+        connected = []
+        if self.graph is None:
+            return connected
+        all_nodes = self.graph.get_all_v()
+        if all_nodes is None or not all_nodes or all_nodes[id1] is None:
+            return connected
+
+        self.dijkstra(id1)
+        for key, node in all_nodes.items():
+            if key is not id1 and node.tag < math.inf:
+                connected.append(node)
+        return connected
 
     def connected_components(self) -> List[list]:
         """
@@ -90,6 +119,16 @@ class GraphAlgo:
         If the graph is None the function should return an empty list []
         """
 
+        connected = []
+        if self.graph is None:
+            return connected
+        all_nodes = self.graph.get_all_v()
+        if all_nodes is None or not all_nodes:
+            return connected
+        for key in all_nodes:
+            connected.append(self.connected_component(key))
+        return connected
+
     def plot_graph(self) -> None:
         """
         Plots the graph.
@@ -98,10 +137,33 @@ class GraphAlgo:
         @return: None
         """
 
-    def dijkstra(self, src: int, dest: int = None, full: bool = False) -> (float, list):
+        x_list = []
+        y_list = []
+        all_nodes = self.graph.get_all_v()
+        all_out_edges = self.graph.edges_out_node
+        for key, node in all_nodes.items():
+            x, y = node.pos
+            x_list.append(x)
+            y_list.append(y)
+        plt.scatter(x_list, y_list)
+
+        ax = plt.axes()
+        for src, dest_dict in all_out_edges.items():
+            for dest in dest_dict:
+                node_src = all_nodes[src]
+                node_dest = all_nodes[dest]
+                x_src, y_src = node_src.pos
+                x_dest, y_dest = node_dest.pos
+                ax.arrow(x_src, y_src, x_dest - x_src, y_dest - y_src, head_width=0.3, head_length=0.2, fc='k', ec='k',
+                         length_includes_head=True, width=0.01)
+
+        plt.title("Graph Plot")
+        plt.show()
+
+    def dijkstra(self, src: int, dest: int = None) -> float:
         all_nodes = self.graph.get_all_v()
         for key, node in all_nodes.items():
-            node.tag = float('inf')
+            node.tag = math.inf
             node.parent = 0
         queue = []
         all_nodes.get(src).tag = 0
@@ -118,13 +180,5 @@ class GraphAlgo:
                 elif node.tag + edges.get(dest_key) < dest_node.tag:
                     dest_node.tag = node.tag + edges.get(dest_key)
                     dest_node.parent = node.key
-            if node.key is dest and not full:
-                parent = node.parent
-                shortest_path = [node]
-                while parent is not all_nodes[src].key:
-                    shortest_path.append(all_nodes.get(parent))
-                    parent = all_nodes.get(parent).parent
-                shortest_path.append(all_nodes.get(parent))
-                shortest_path.reverse()
-                return node.tag, shortest_path
-                # move list making to shortest path to reduce run time
+            if dest is not None and node.key is dest:
+                return node.tag
