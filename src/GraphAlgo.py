@@ -5,6 +5,7 @@ from src.NodeData import NodeData
 from src.DiGraph import DiGraph
 import math
 import json
+import random as rand
 import matplotlib.pyplot as plt
 
 
@@ -29,9 +30,17 @@ class GraphAlgo:
 
         if file_name is None:
             return False
-
         with open(file_name, 'r') as file:
-            self.graph = json.load(file)
+            graph_dict = json.load(file)
+        graph = DiGraph()
+        nodes_list = graph_dict["Nodes"]
+        edges_list = graph_dict["Edges"]
+        for node_dict in nodes_list:
+            graph.add_node(node_dict["id"])
+
+        for edge_dict in edges_list:
+            graph.add_edge(edge_dict["src"], edge_dict["dest"], edge_dict["w"])
+        self.graph = graph
         return True
 
     def save_to_json(self, file_name: str) -> bool:
@@ -43,9 +52,23 @@ class GraphAlgo:
 
         if file_name is None:
             return False
+        all_nodes = self.graph.get_all_v()
+        data = {}
+        list_of_nodes = []
+        for key, node in all_nodes.items():
+            dict_of_nodes = {"id": key}
+            list_of_nodes.append(dict_of_nodes)
+        data["Nodes"] = list_of_nodes
 
+        list_of_edges = []
+        for src_node in all_nodes:
+            out_edges = self.graph.all_out_edges_of_node(src_node)
+            for dest_node, weight in out_edges.items():
+                dict_of_edges = {"src": src_node, "w": weight, "dest": dest_node}
+                list_of_edges.append(dict_of_edges)
+        data["Edges"] = list_of_edges
         with open(file_name, 'w') as file:
-            json.dump(self.graph, file, default=lambda o: o.__dict__, indent=4)
+            json.dump(data, file)
         return True
 
     def shortest_path(self, id1: int, id2: int) -> (float, list):
@@ -81,11 +104,11 @@ class GraphAlgo:
         if all_nodes[id2].tag is math.inf:
             return math.inf, []
 
-        node = all_nodes.get(id2)
-        shortest_path = [node]
+        node = all_nodes[id2]
+        shortest_path = [node.key]
         while node.key is not all_nodes[id1].key:
             node = all_nodes.get(node.parent)
-            shortest_path.append(node)
+            shortest_path.append(node.key)
         shortest_path.reverse()
         return distance, shortest_path
 
@@ -97,18 +120,38 @@ class GraphAlgo:
         Notes:
         If the graph is None or id1 is not in the graph, the function should return an empty list []
         """
-
         connected = []
         if self.graph is None:
             return connected
-        all_nodes = self.graph.get_all_v()
-        if all_nodes is None or not all_nodes or all_nodes[id1] is None:
+        all_nodes_original = self.graph.get_all_v()
+        if all_nodes_original is None or not all_nodes_original or all_nodes_original[id1] is None:
             return connected
 
+        original_list = []
+        copy_list = []
         self.dijkstra(id1)
-        for key, node in all_nodes.items():
-            if key is not id1 and node.tag < math.inf:
-                connected.append(node)
+        original_graph = self.graph
+        copy_graph = DiGraph()
+        for key, node in all_nodes_original.items():
+            copy_graph.add_node(key)
+            if node.tag < math.inf:
+                original_list.append(key)
+
+        for src in all_nodes_original:
+            for dest, weight in original_graph.all_out_edges_of_node(src).items():
+                copy_graph.add_edge(dest, src, weight)
+
+        self.graph = copy_graph
+        self.dijkstra(id1)
+
+        for key, node in copy_graph.get_all_v().items():
+            if node.tag < math.inf:
+                copy_list.append(key)
+
+        for key in copy_list:
+            if key in original_list:
+                connected.append(key)
+        self.graph = original_graph
         return connected
 
     def connected_components(self) -> List[list]:
@@ -119,15 +162,22 @@ class GraphAlgo:
         If the graph is None the function should return an empty list []
         """
 
-        connected = []
+        connected_components = []
         if self.graph is None:
-            return connected
+            return connected_components
+
         all_nodes = self.graph.get_all_v()
         if all_nodes is None or not all_nodes:
-            return connected
+            return connected_components
+
+        check_set = set()
         for key in all_nodes:
-            connected.append(self.connected_component(key))
-        return connected
+            if not connected_components or key not in check_set:
+                connected_list = self.connected_component(key)
+                if connected_list:
+                    connected_components.append(connected_list)
+                    check_set |= set(connected_list)
+        return connected_components
 
     def plot_graph(self) -> None:
         """
@@ -136,25 +186,35 @@ class GraphAlgo:
         Otherwise, they will be placed in a random but elegant manner.
         @return: None
         """
-
         x_list = []
         y_list = []
+        pos_dict = {}
         all_nodes = self.graph.get_all_v()
-        all_out_edges = self.graph.edges_out_node
+        x_min, y_min, x_max, y_max = self.get_min_max()
         for key, node in all_nodes.items():
-            x, y = node.pos
-            x_list.append(x)
-            y_list.append(y)
-        plt.scatter(x_list, y_list)
+            if node.pos is not None:
+                x, y = node.pos
+                x_list.append(x)
+                y_list.append(y)
+                pos_dict[key] = node.pos
+            else:
+                x_val = rand.uniform(x_min, x_max)
+                y_val = rand.uniform(y_min, y_max)
+                x_list.append(x_val)
+                y_list.append(y_val)
+                pos_dict[key] = x_val, y_val
 
-        ax = plt.axes()
-        for src, dest_dict in all_out_edges.items():
-            for dest in dest_dict:
-                node_src = all_nodes[src]
-                node_dest = all_nodes[dest]
-                x_src, y_src = node_src.pos
-                x_dest, y_dest = node_dest.pos
-                ax.arrow(x_src, y_src, x_dest - x_src, y_dest - y_src, head_width=0.3, head_length=0.2, fc='k', ec='k',
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.plot(x_list, y_list, ls="", marker="o", color='red')
+        for x, y, key in zip(x_list, y_list, all_nodes):
+            ax.annotate(str(key), xy=(x, y), fontsize=15, color='green')
+
+        for key in all_nodes:
+            for dest, weight in self.graph.all_out_edges_of_node(key).items():
+                x_src, y_src = pos_dict[key]
+                x_dest, y_dest = pos_dict[dest]
+                ax.arrow(x_src, y_src, x_dest - x_src, y_dest - y_src, head_width=0.1, head_length=0.2, fc='k',
+                         ec='k',
                          length_includes_head=True, width=0.01)
 
         plt.title("Graph Plot")
@@ -182,3 +242,16 @@ class GraphAlgo:
                     dest_node.parent = node.key
             if dest is not None and node.key is dest:
                 return node.tag
+
+    def get_min_max(self) -> (float, float, float, float):
+        all_nodes = self.graph.get_all_v()
+        x_list = []
+        y_list = []
+        for key, node in all_nodes.items():
+            if node.pos is not None:
+                x, y = node.pos
+                x_list.append(x)
+                y_list.append(y)
+        if not x_list or not y_list:
+            return 0, 0, 10, 10
+        return min(x_list), min(y_list), max(x_list), max(y_list)
