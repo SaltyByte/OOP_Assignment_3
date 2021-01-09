@@ -29,22 +29,31 @@ class GraphAlgo:
         @returns True if the loading was successful, False o.w.
         """
 
+        # If file is empty, return false
         if file_name is None:
             return False
+        # Read from json format file and load to graph
         with open(file_name, 'r') as file:
             graph_dict = json.load(file)
         graph = DiGraph()
         nodes_list = graph_dict["Nodes"]
         edges_list = graph_dict["Edges"]
+        # Loop over the nodes list from the json format
         for node_dict in nodes_list:
+            # If pos does not exists in the dictionary of nodes from the nodes list, add only the id
             if "pos" not in node_dict:
                 graph.add_node(node_dict["id"])
+            # If pos does exists in the dictionary of nodes from the nodes list, add id and pos
             else:
                 x, y, z = node_dict["pos"].split(',')
                 graph.add_node(node_dict["id"], (float(x), float(y), float(z)))
 
+        # Loop over the edges list from the json format
         for edge_dict in edges_list:
+            # add an edge between src, dest and weight from the json format to the graph
             graph.add_edge(edge_dict["src"], edge_dict["dest"], edge_dict["w"])
+
+        # Copy the updated graph to the original graph
         self.graph = graph
         return True
 
@@ -55,23 +64,34 @@ class GraphAlgo:
         @return: True if the save was successful, False o.w.
         """
 
+        # If file is empty, return false
         if file_name is None:
             return False
         all_nodes = self.graph.get_all_v()
         data = {}
         list_of_nodes = []
+        # Loop over all the nodes in the graph
         for key, node in all_nodes.items():
+            # Put in the dictionary of nodes the id and pos from json format
             dict_of_nodes = {"id": key, "pos": node.pos}
+            # Put in the list of nodes the dictionary of the nodes that contains the id and pos
             list_of_nodes.append(dict_of_nodes)
+        # The dictionary data includes the key that contains Nodes from json format and in value the list of nodes
         data["Nodes"] = list_of_nodes
 
         list_of_edges = []
+        # Loop over all the nodes in the graph
         for src_node in all_nodes:
             out_edges = self.graph.all_out_edges_of_node(src_node)
+            # Loop over all the dest and weight of the out edges in the graph
             for dest_node, weight in out_edges.items():
+                # Put in the dictionary of edges the src, dest and weight from json format
                 dict_of_edges = {"src": src_node, "w": weight, "dest": dest_node}
+                # Put in the dictionary of edges the dictionary of the edges that contains the src, dest and weight
                 list_of_edges.append(dict_of_edges)
+        # The dictionary data includes the key that contains Edges from json format and in value the list of edges
         data["Edges"] = list_of_edges
+        # Write the graph to a file in json format
         with open(file_name, 'w') as file:
             json.dump(data, file)
         return True
@@ -101,19 +121,27 @@ class GraphAlgo:
         """
 
         all_nodes = self.graph.get_all_v()
+        # If id1 or id2 are not in the graph, returns distance of infinity and an empty list
         if id1 not in all_nodes or id2 not in all_nodes:
             return math.inf, []
+        # If id1 is equal to id2, returns distance of 0 and a list with one of the node ids
         if id1 is id2:
             return 0, [id2]
+        # Using dijkstra algorithm with id1 and id2 to receive the distance
         self.dijkstra(id1, id2)
+        # If the tag of id2 node is equal to infinity it was not visited, returns distance of infinity and an empty list
         if all_nodes[id2].tag is math.inf:
             return math.inf, []
 
+        # put in the shortest path list the node key of id2 (the dest node)
         node = all_nodes[id2]
         shortest_path = [node.key]
+        # Loop while have not reached id1 node key (the src node)
         while node.key is not all_nodes[id1].key:
+            # Get the parent node and put the key in the shortest path list
             node = all_nodes.get(node.parent)
             shortest_path.append(node.key)
+        # Reverse the shortest path list to get from src to dest, that was inserted backwards
         shortest_path.reverse()
         return all_nodes[id2].tag, shortest_path
 
