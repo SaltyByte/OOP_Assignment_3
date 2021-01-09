@@ -1,5 +1,4 @@
 import networkx as nx
-import json
 import time
 from src.GraphAlgo import GraphAlgo
 

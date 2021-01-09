@@ -1,5 +1,6 @@
 from typing import List
 import heapq as q
+from queue import PriorityQueue
 from src import GraphInterface
 from src.NodeData import NodeData
 from src.DiGraph import DiGraph
@@ -104,7 +105,7 @@ class GraphAlgo:
             return math.inf, []
         if id1 is id2:
             return 0, [id2]
-        distance = self.dijkstra(id1, id2)
+        self.dijkstra(id1, id2)
         if all_nodes[id2].tag is math.inf:
             return math.inf, []
 
@@ -114,7 +115,7 @@ class GraphAlgo:
             node = all_nodes.get(node.parent)
             shortest_path.append(node.key)
         shortest_path.reverse()
-        return distance, shortest_path
+        return all_nodes[id2].tag, shortest_path
 
     def connected_component(self, id1: int) -> list:
         """
@@ -228,28 +229,28 @@ class GraphAlgo:
         plt.title("Graph Plot")
         plt.show()
 
-    def dijkstra(self, src: int, dest: int = None) -> float:
+    def dijkstra(self, src: int):
         all_nodes = self.graph.get_all_v()
         for key, node in all_nodes.items():
             node.tag = math.inf
             node.parent = 0
-        queue = []
         all_nodes.get(src).tag = 0
-        q.heappush(queue, all_nodes.get(src))
-        while queue:
-            node: NodeData = q.heappop(queue)
+        pq = PriorityQueue()
+        pq.put(all_nodes[src])
+        while not pq.empty():
+            node: NodeData = pq.get()
             edges = self.graph.all_out_edges_of_node(node.key)
             for dest_key in edges:
                 dest_node = all_nodes.get(dest_key)
-                if node.tag < dest_node.tag and dest_node not in queue:
+                if node.tag < dest_node.tag and dest_node not in pq.queue:
                     dest_node.tag = node.tag + edges.get(dest_key)
                     dest_node.parent = node.key
-                    q.heappush(queue, dest_node)
+                    pq.put(dest_node)
                 elif node.tag + edges.get(dest_key) < dest_node.tag:
                     dest_node.tag = node.tag + edges.get(dest_key)
                     dest_node.parent = node.key
-            if dest is not None and node.key is dest:
-                return node.tag
+                # if dest is not None and node.key is dest:
+                    # return node.tag
 
     def get_min_max(self) -> (float, float, float, float, float, float):
         all_nodes = self.graph.get_all_v()
