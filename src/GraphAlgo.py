@@ -36,7 +36,11 @@ class GraphAlgo:
         nodes_list = graph_dict["Nodes"]
         edges_list = graph_dict["Edges"]
         for node_dict in nodes_list:
-            graph.add_node(node_dict["id"])
+            if "pos" not in node_dict:
+                graph.add_node(node_dict["id"])
+            else:
+                x, y, z = node_dict["pos"].split(',')
+                graph.add_node(node_dict["id"], (float(x), float(y), float(z)))
 
         for edge_dict in edges_list:
             graph.add_edge(edge_dict["src"], edge_dict["dest"], edge_dict["w"])
@@ -56,7 +60,7 @@ class GraphAlgo:
         data = {}
         list_of_nodes = []
         for key, node in all_nodes.items():
-            dict_of_nodes = {"id": key}
+            dict_of_nodes = {"id": key, "pos": node.pos}
             list_of_nodes.append(dict_of_nodes)
         data["Nodes"] = list_of_nodes
 
@@ -188,21 +192,25 @@ class GraphAlgo:
         """
         x_list = []
         y_list = []
+        z_list = []
         pos_dict = {}
         all_nodes = self.graph.get_all_v()
-        x_min, y_min, x_max, y_max = self.get_min_max()
+        x_min, y_min, z_min, x_max, y_max, z_max = self.get_min_max()
         for key, node in all_nodes.items():
             if node.pos is not None:
-                x, y = node.pos
+                x, y, z = node.pos
                 x_list.append(x)
                 y_list.append(y)
+                z_list.append(z)
                 pos_dict[key] = node.pos
             else:
                 x_val = rand.uniform(x_min, x_max)
                 y_val = rand.uniform(y_min, y_max)
+                z_val = rand.uniform(z_min, z_max)
                 x_list.append(x_val)
                 y_list.append(y_val)
-                pos_dict[key] = x_val, y_val
+                z_list.append(z_val)
+                pos_dict[key] = x_val, y_val, z_val
 
         fig, ax = plt.subplots(figsize=(10, 5))
         ax.plot(x_list, y_list, ls="", marker="o", color='red')
@@ -211,11 +219,11 @@ class GraphAlgo:
 
         for key in all_nodes:
             for dest, weight in self.graph.all_out_edges_of_node(key).items():
-                x_src, y_src = pos_dict[key]
-                x_dest, y_dest = pos_dict[dest]
-                ax.arrow(x_src, y_src, x_dest - x_src, y_dest - y_src, head_width=0.1, head_length=0.2, fc='k',
+                x_src, y_src, z_src = pos_dict[key]
+                x_dest, y_dest, z_dest = pos_dict[dest]
+                ax.arrow(x_src, y_src, x_dest - x_src, y_dest - y_src, head_width=0.0003, head_length=0.0003, fc='k',
                          ec='k',
-                         length_includes_head=True, width=0.01)
+                         length_includes_head=True, width=0.00005)
 
         plt.title("Graph Plot")
         plt.show()
@@ -243,15 +251,17 @@ class GraphAlgo:
             if dest is not None and node.key is dest:
                 return node.tag
 
-    def get_min_max(self) -> (float, float, float, float):
+    def get_min_max(self) -> (float, float, float, float, float, float):
         all_nodes = self.graph.get_all_v()
         x_list = []
         y_list = []
+        z_list = []
         for key, node in all_nodes.items():
             if node.pos is not None:
-                x, y = node.pos
+                x, y, z = node.pos
                 x_list.append(x)
                 y_list.append(y)
+                z_list.append(z)
         if not x_list or not y_list:
-            return 0, 0, 10, 10
-        return min(x_list), min(y_list), max(x_list), max(y_list)
+            return 0, 0, 0, 10, 10, 0
+        return min(x_list), min(y_list), min(z_list), max(x_list), max(y_list), max(z_list)
