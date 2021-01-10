@@ -1,4 +1,4 @@
-#Assignment Three Information
+# Assignment Three Information
 
 This repository is split into Three parts.
 Part one of the repository is a representation of a directed weighted graph.
