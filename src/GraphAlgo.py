@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 
 class GraphAlgo:
-    """This abstract class represents algorithms functions, save and load to json and plot of a graph."""
+    """This class represents algorithms functions, save and load to json and plot of a graph."""
 
     def __init__(self, graph=DiGraph()):
         """
