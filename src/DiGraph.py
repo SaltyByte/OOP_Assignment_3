@@ -7,7 +7,6 @@ class DiGraph:
     def __init__(self):
         """
         Constructor
-        @param graph: the graph of DiGraph
         """
         self.mc = 0
         self.edge_size = 0
@@ -73,7 +72,7 @@ class DiGraph:
         Note: If the edge already exists or one of the nodes dose not exists the functions will do nothing
         """
         # If id1 is equal to id2 or if id1, id2 are not in the graph, return false
-        if id1 is id2 or id1 not in self.nodes_in_graph or id2 not in self.nodes_in_graph:
+        if id1 is id2 or id1 not in self.nodes_in_graph or id2 not in self.nodes_in_graph or weight <= 0:
             return False
         # If id1 is not in the dictionary of edges_out_node, then create a new inner dictionary with id1
         if id1 not in self.edges_out_node:

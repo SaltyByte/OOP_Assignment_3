@@ -5,7 +5,7 @@ from src.GraphAlgo import GraphAlgo
 if __name__ == '__main__':
 
     algo_graph_ex3 = GraphAlgo()
-    algo_graph_ex3.load_from_json("G_30000_240000_1.json")
+    algo_graph_ex3.load_from_json("G_100_800_1.json")
     graph_nx = nx.DiGraph()
 
     for key in algo_graph_ex3.graph.get_all_v():
@@ -31,24 +31,24 @@ if __name__ == '__main__':
     # print("Shortest path time of networkX : " + str(sum1))
     # print("Shortest path time of Python : " + str(sum2))
 
-    sum1 = 0
+
+
+    # sum1 = 0
     # sum2 = 0
-
-    start = time.time()
-    connected = nx.strongly_connected_components(graph_nx)
-    end = time.time()
-    sum1 += (end - start)
-
+    #
+    # start = time.time()
+    # connected = nx.strongly_connected_components(graph_nx)
+    # end = time.time()
+    # sum1 += (end - start)
+    #
     # start_my = time.time()
     # our_connected = algo_graph_ex3.connected_components()
     # end_my = time.time()
     # sum2 += (end_my - start_my)
-
-    print("connected components time of networkX : " + str(sum1))
-    print(connected)
-    print(start, end)
-    # print("connected components time of Python : " + str(sum2))
     #
+    # print("connected components time of networkX : " + str(sum1))
+    # print("connected components time of Python : " + str(sum2))
+
     # sum2 = 0
     # start_my = time.time()
     # our_connect = algo_graph_ex3.connected_component(1)

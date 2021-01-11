@@ -86,6 +86,8 @@ class TestGraphAlgo(unittest.TestCase):
 
     def test_connected_components(self):
         self.assertEqual([[1, 2, 3], [4, 5, 6], [7], [8, 9], [10], [11], [12, 13, 14]], self.graph_algo2.connected_components())
+        self.assertEqual([4, 5, 6], self.graph_algo2.connected_component(4))
+        self.assertEqual([12, 13, 14], self.graph_algo2.connected_component(12))
 
 
 if __name__ == '__main__':

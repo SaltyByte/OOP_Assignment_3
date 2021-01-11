@@ -48,6 +48,7 @@ class TestDiGraph(unittest.TestCase):
 
     def test_v_e_size_removes_and_add(self):
         graph = DiGraph()
+        self.assertEqual(False, self.graph.add_edge(1, 7, -1))
         self.assertEqual(0, graph.e_size())
         self.assertEqual(0, graph.v_size())
         self.assertEqual(0, graph.get_mc())

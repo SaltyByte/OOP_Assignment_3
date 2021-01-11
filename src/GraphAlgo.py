@@ -176,43 +176,16 @@ class GraphAlgo:
         if all_nodes_original is None or not all_nodes_original or all_nodes_original[id1] is None:
             return connected
 
-        original_list = []
-        copy_list = []
-        # Using dijkstra on id1 as a starting node to go over the graph
-        self.dijkstra(id1)
-        original_graph = self.graph
-        # Create a new graph as a copy_graph to reverse the edges to find the strongly connected nodes
-        copy_graph = DiGraph()
-        # Loop over the nodes in the original graph and add the key of the node to the copy_graph
-        for key, node in all_nodes_original.items():
-            copy_graph.add_node(key)
-            # If the node tag is less then infinity, then add the key to the list, because the node was passed though
-            if node.tag < math.inf:
-                original_list.append(key)
-        # Loop over all the nodes in the original graph
-        for src in all_nodes_original:
-            # Loop over all the out edges of a node to get its dest node and the weight between them
-            for dest, weight in original_graph.all_out_edges_of_node(src).items():
-                # add an edge backwards from dest to src with the weight between them
-                copy_graph.add_edge(dest, src, weight)
+        # in_nodes list
+        in_nodes = self.dijkstra_for_connected(id1, True)
+        # out_nodes list
+        out_nodes = self.dijkstra_for_connected(id1, False)
 
-        # Copy the copy_graph to the graph to use dijkstra on id1
-        self.graph = copy_graph
-        self.dijkstra(id1)
-
-        # Loop over the nodes in the copy_graph
-        for key, node in copy_graph.get_all_v().items():
-            # If the node tag is less then infinity, then add the key of the node to the copy_list
-            if node.tag < math.inf:
-                copy_list.append(key)
-
-        # Loop over the copy_list
-        for key in copy_list:
+        # Loop over the in_nodes list
+        for key in in_nodes:
             # If the key of the copy_list is in the original list, then add the key to the connected list
-            if key in original_list:
+            if key in out_nodes:
                 connected.append(key)
-        # Copy the original graph to the graph
-        self.graph = original_graph
         return connected
 
     def connected_components(self) -> List[list]:
@@ -332,6 +305,28 @@ class GraphAlgo:
                     dest_node.tag = path
                     dest_node.parent = node.key
                     heapq.heappush(queue, dest_node)
+
+    def dijkstra_for_connected(self, src: int, flag=None):
+        all_nodes = self.graph.get_all_v()
+        for key, node in all_nodes.items():
+            node.tag = math.inf
+            node.parent = 0
+        all_nodes.get(src).tag = 0
+        visited = [all_nodes[src].key]
+        queue = [all_nodes[src]]
+        while queue:
+            node: NodeData = queue.pop()
+            if flag:
+                edges = self.graph.all_out_edges_of_node(node.key)
+            else:
+                edges = self.graph.all_in_edges_of_node(node.key)
+            for dest_key, weight in edges.items():
+                dest_node = all_nodes.get(dest_key)
+                if dest_node.tag is math.inf:
+                    dest_node.tag = 0
+                    visited.append(dest_node.key)
+                    queue.append(dest_node)
+        return visited
 
     def get_min_max(self) -> (float, float, float, float, float, float):
         """
