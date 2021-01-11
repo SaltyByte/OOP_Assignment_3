@@ -1,63 +1,96 @@
 from src.DiGraph import DiGraph
-from src.GraphAlgo import GraphAlgo
 import unittest
 
 
-class TestDiGraph:
+class TestDiGraph(unittest.TestCase):
+    def setUp(self):
+        graph = DiGraph()
+        graph.add_node(1)
+        graph.add_node(2)
+        graph.add_node(3)
+        graph.add_node(4)
+        graph.add_node(5)
+        graph.add_node(6)
+        graph.add_node(7)
+        graph.add_node(8)
+        graph.add_node(9)
+        graph.add_node(10)
+        graph.add_node(11)
+        graph.add_node(12)
+        graph.add_node(13)
+        graph.add_node(14)
 
+        graph.add_edge(1, 2, 5)
+        graph.add_edge(2, 3, 2)
+        graph.add_edge(2, 4, 1)
+        graph.add_edge(3, 2, 5)
+        graph.add_edge(3, 4, 10)
+        graph.add_edge(1, 5, 3)
+        graph.add_edge(7, 3, 2)
+        graph.add_edge(7, 4, 2)
+        graph.add_edge(7, 9, 5)
+        graph.add_edge(9, 5, 3)
+        graph.add_edge(5, 4, 12)
+        graph.add_edge(4, 9, 1.2)
+        graph.add_edge(9, 14, 7)
+        graph.add_edge(14, 8, 3)
+        graph.add_edge(8, 3, 6)
+        graph.add_edge(5, 12, 17)
+        graph.add_edge(12, 13, 2)
+        graph.add_edge(13, 5, 9.4)
+        graph.add_edge(5, 6, 1)
+        graph.add_edge(6, 11, 4)
+        graph.add_edge(11, 10, 4)
+        graph.add_edge(10, 11, 4)
+        graph.add_edge(10, 12, 2)
+        graph.add_edge(3, 9, 3.5)
+        self.graph = graph
 
+    def test_v_e_size_removes_and_add(self):
+        graph = DiGraph()
+        self.assertEqual(0, graph.e_size())
+        self.assertEqual(0, graph.v_size())
+        self.assertEqual(0, graph.get_mc())
+        self.assertEqual(False, graph.remove_edge(1, 3))
+        self.assertEqual({}, graph.all_out_edges_of_node(3))
+        self.assertEqual({}, graph.all_in_edges_of_node(3))
+        self.assertEqual(14, self.graph.v_size())
+        self.assertEqual(24, self.graph.e_size())
+        self.assertEqual(True, self.graph.remove_node(4))
+        self.assertEqual(True, self.graph.remove_edge(1, 2))
+        self.graph.remove_edge(11, 10)
+        self.assertEqual(False, self.graph.remove_node(15))
+        self.assertEqual(False, self.graph.remove_node(0))
+        self.assertEqual(False, self.graph.remove_node(-1))
+        self.assertEqual(False, self.graph.remove_edge(11, 11))
+        self.assertEqual(False, self.graph.remove_edge(6, 5))
+        self.assertEqual(17, self.graph.e_size())
+        self.assertEqual(13, self.graph.v_size())
+        self.graph.add_node(99)
+        self.assertEqual(14, self.graph.v_size())
+        self.graph.add_edge(99, 10, 5)
+        self.graph.add_edge(99, 5, 5)
+        self.graph.add_edge(99, 10, 5)
+        self.graph.add_edge(99, 99, 5)
+        self.graph.add_edge(10, 99, 5)
+        self.graph.add_edge(10, 99, 5)
+        self.assertEqual(20, self.graph.e_size())
+        self.assertEqual(50, self.graph.get_mc())
 
-
-
-    pass
-
-def main():
-    graph = DiGraph()
-    graph.add_node(0)
-    graph.add_node(1)
-    graph.add_node(2)
-    graph.add_node(3)
-    graph.add_node(4)
-
-    graph.add_edge(0, 1, 10)
-    graph.add_edge(1, 0, 80)
-    graph.add_edge(1, 3, 70)
-    graph.add_edge(2, 0, 30)
-    graph.add_edge(2, 1, 20)
-    graph.add_edge(2, 3, 40)
-    graph.add_edge(4, 2, 60)
-    graph.add_edge(4, 3, 50)
-    graph.add_edge(-1, 2, 100)
-    graph.add_edge(5, 3, 200)
-    graph.add_edge(7, 8, 300)
-    graph.add_edge(0, 0, 400)
-    graph.add_edge(0, 1, 500)
-
-    print("MC(13) : " + str(graph.get_mc()) + ", Node size(5) : " + str(graph.v_size()) + ", Edge size(8) : " + str(
-        graph.e_size()) + ", Edges out of 0 {1: 10} : " + str(graph.all_out_edges_of_node(0)))
-    print("Edges in 2 {4: 60} : " + str(graph.all_in_edges_of_node(2)))
-    print("Edges out of 2 {0: 30,1: 20,3: 40} : " + str(graph.all_out_edges_of_node(2)))
-
-    graph.remove_edge(0, 2)
-    graph.remove_edge(0, 3)
-    graph.remove_edge(2, 0)
-    graph.remove_edge(5, 6)
-    graph.remove_edge(5, 2)
-    graph.remove_edge(2, 5)
-    graph.remove_edge(-1, 0)
-    graph.remove_edge(0, 0)
-    graph.remove_edge(0, 1)
-    graph.remove_edge(1, 0)
-
-    print("MC(16) : " + str(graph.get_mc()) + ", Edge size(5) : " + str(
-        graph.e_size()) + ", Edges out of 0 {} : " + str(
-        graph.all_out_edges_of_node(0)))
-
-    print("Edges out of 3 {}: " + str(graph.all_out_edges_of_node(3)))
-    graph.remove_node(3)
-
-    print("MC(20) : " + str(graph.get_mc()) + ", Edge size(2) : " + str(
-        graph.e_size()) + ", Nodes in graph(4) : " + str(graph.v_size()))
+    def test_get_all_funcs(self):
+        graph = DiGraph()
+        self.assertEqual({}, graph.all_in_edges_of_node(1))
+        self.assertEqual({}, graph.all_out_edges_of_node(1))
+        self.assertEqual([], list(graph.get_all_v().keys()))
+        self.assertEqual([], list(self.graph.all_out_edges_of_node(15)))
+        self.assertEqual([], list(self.graph.all_in_edges_of_node(15)))
+        self.assertEqual({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, self.graph.get_all_v().keys())
+        self.assertEqual({1, 9, 13}, self.graph.all_in_edges_of_node(5).keys())
+        self.assertEqual({3, 7, 4}, self.graph.all_in_edges_of_node(9).keys())
+        self.assertEqual([], list(self.graph.all_in_edges_of_node(1).keys()))
+        self.assertEqual({2, 5}, self.graph.all_out_edges_of_node(1).keys())
+        self.graph.remove_node(5)
+        self.assertEqual({1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14}, self.graph.get_all_v().keys())
 
 
 if __name__ == '__main__':

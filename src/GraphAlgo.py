@@ -1,9 +1,9 @@
 from typing import List
-from queue import PriorityQueue
 from src import GraphInterface
 from src.NodeData import NodeData
 from src.DiGraph import DiGraph
 import math
+import heapq
 import json
 import random as rand
 import matplotlib.pyplot as plt
@@ -36,8 +36,11 @@ class GraphAlgo:
         if file_name is None:
             return False
         # Read from json format file and load to graph
-        with open(file_name, 'r') as file:
-            graph_dict = json.load(file)
+        try:
+            with open(file_name, 'r') as file:
+                graph_dict = json.load(file)
+        except FileNotFoundError:
+            return False
         graph = DiGraph()
         nodes_list = graph_dict["Nodes"]
         edges_list = graph_dict["Edges"]
@@ -48,7 +51,11 @@ class GraphAlgo:
                 graph.add_node(node_dict["id"])
             # If pos does exists in the dictionary of nodes from the nodes list, add id and pos
             else:
-                x, y, z = node_dict["pos"].split(',')
+                list_of_pos = node_dict["pos"]
+                if type(list_of_pos) is str:
+                    x, y, z = list_of_pos.split(',')
+                else:
+                    x, y, z = list_of_pos
                 graph.add_node(node_dict["id"], (float(x), float(y), float(z)))
 
         # Loop over the edges list from the json format
@@ -76,7 +83,10 @@ class GraphAlgo:
         # Loop over all the nodes in the graph
         for key, node in all_nodes.items():
             # Put in the dictionary of nodes the id and pos from json format
-            dict_of_nodes = {"id": key, "pos": node.pos}
+            if node.pos is not None:
+                dict_of_nodes = {"id": key, "pos": node.pos}
+            else:
+                dict_of_nodes = {"id": key}
             # Put in the list of nodes the dictionary of the nodes that contains the id and pos
             list_of_nodes.append(dict_of_nodes)
         # The dictionary data includes the key that contains Nodes from json format and in value the list of nodes
@@ -305,22 +315,23 @@ class GraphAlgo:
             node.tag = math.inf
             node.parent = 0
         all_nodes.get(src).tag = 0
-        pq = PriorityQueue()
-        pq.put(all_nodes[src])
-        while not pq.empty():
-            node: NodeData = pq.get()
+        all_nodes.get(src).parent = src
+        queue = []
+        heapq.heappush(queue, all_nodes[src])
+        while queue:
+            node: NodeData = heapq.heappop(queue)
             edges = self.graph.all_out_edges_of_node(node.key)
-            for dest_key in edges:
+            for dest_key, weight in edges.items():
                 dest_node = all_nodes.get(dest_key)
-                if node.tag < dest_node.tag and dest_node not in pq.queue:
-                    dest_node.tag = node.tag + edges.get(dest_key)
+                path = node.tag + weight
+                if dest_node.tag is math.inf:
+                    dest_node.tag = path
                     dest_node.parent = node.key
-                    pq.put(dest_node)
-                elif node.tag + edges.get(dest_key) < dest_node.tag:
-                    dest_node.tag = node.tag + edges.get(dest_key)
+                    heapq.heappush(queue, dest_node)
+                elif path < dest_node.tag:
+                    dest_node.tag = path
                     dest_node.parent = node.key
-                # if dest is not None and node.key is dest:
-                    # return node.tag
+                    heapq.heappush(queue, dest_node)
 
     def get_min_max(self) -> (float, float, float, float, float, float):
         """
@@ -342,7 +353,7 @@ class GraphAlgo:
                 y_list.append(y)
                 z_list.append(z)
         # If the lists are empty, returns basic values to min and max of x, y, z
-        if not x_list or not y_list:
+        if not x_list or not y_list or len(x_list) == 1 or len(y_list) == 1:
             return 0, 0, 0, 10, 10, 0
         # Using min and max functions to return the min and max of x,y,z from their lists
         return min(x_list), min(y_list), min(z_list), max(x_list), max(y_list), max(z_list)

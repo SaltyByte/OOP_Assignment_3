@@ -4,20 +4,16 @@ from src.NodeData import NodeData
 class DiGraph:
     """This class represents a directed weighted graph with basic functions."""
 
-    def __init__(self, graph=None):
+    def __init__(self):
         """
         Constructor
         @param graph: the graph of DiGraph
         """
-        if graph is None:
-            self.mc = 0
-            self.edge_size = 0
-            self.nodes_in_graph = {}
-            self.edges_in_node = {}
-            self.edges_out_node = {}
-        # else:
-        #     self.mc = graph.mc
-        #     self.edge_size = graph.edge_size
+        self.mc = 0
+        self.edge_size = 0
+        self.nodes_in_graph = {}
+        self.edges_in_node = {}
+        self.edges_out_node = {}
 
     def v_size(self) -> int:
         """
