@@ -69,7 +69,9 @@ class TestGraphAlgo(unittest.TestCase):
         self.assertEqual(self.graph_algo.get_graph().get_all_v().keys(), graph_algo2.get_graph().get_all_v().keys())
         self.assertEqual(self.graph_algo.get_graph().v_size(), graph_algo2.get_graph().v_size())
         self.assertEqual(self.graph_algo.get_graph().e_size(), graph_algo2.get_graph().e_size())
-        self.assertEqual(self.graph_algo.get_graph().__dict__.keys(), graph_algo2.get_graph().__dict__.keys())
+        dict1 = self.graph_algo.get_graph().__dict__
+        dict2 = graph_algo2.get_graph().__dict__
+        self.assertEqual(dict1, dict2)
         self.assertEqual(self.graph_algo.get_graph().all_in_edges_of_node(4), graph_algo2.get_graph().all_in_edges_of_node(4))
         self.assertNotEqual(self.graph_algo.get_graph(), graph_algo2.get_graph())
 

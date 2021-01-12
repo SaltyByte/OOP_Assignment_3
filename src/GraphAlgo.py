@@ -133,10 +133,12 @@ class GraphAlgo:
         https://en.wikipedia.org/wiki/Dijkstra's_algorithm
         """
 
+        if self.graph is None:
+            return float('inf'), []
         all_nodes = self.graph.get_all_v()
         # If id1 or id2 are not in the graph, returns distance of infinity and an empty list
         if id1 not in all_nodes or id2 not in all_nodes:
-            return math.inf, []
+            return float('inf'), []
         # If id1 is equal to id2, returns distance of 0 and a list with one of the node ids
         if id1 is id2:
             return 0, [id2]
@@ -144,7 +146,7 @@ class GraphAlgo:
         self.dijkstra(id1)
         # If the tag of id2 node is equal to infinity it was not visited, returns distance of infinity and an empty list
         if all_nodes[id2].tag is math.inf:
-            return math.inf, []
+            return float('inf'), []
 
         # put in the shortest path list the node key of id2 (the dest node)
         node = all_nodes[id2]
@@ -170,10 +172,10 @@ class GraphAlgo:
         # If graph is empty, returns an empty list
         if self.graph is None:
             return connected
-        all_nodes_original = self.graph.get_all_v()
+        all_nodes = self.graph.get_all_v()
         # If there are no nodes in the graph or all nodes is empty
         # or id1 does not exists in the graph, returns an empty list
-        if all_nodes_original is None or not all_nodes_original or all_nodes_original[id1] is None:
+        if all_nodes is None or not all_nodes or id1 not in all_nodes:
             return connected
 
         # in_nodes list

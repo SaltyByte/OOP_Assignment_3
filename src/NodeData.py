@@ -12,3 +12,6 @@ class NodeData:
 
     def __lt__(self, other):
         return self.tag < other.tag
+
+    def __eq__(self, other):
+        return self.key == other.key and self.pos == other.pos
