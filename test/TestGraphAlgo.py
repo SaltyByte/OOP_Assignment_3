@@ -36,8 +36,20 @@ class TestGraphAlgo(unittest.TestCase):
         self.graph_algo = GraphAlgo(graph)
 
         graph2 = DiGraph()
-        for i in range(1, 15):
-            graph2.add_node(i)
+        graph2.add_node(1, (1, 3, 0))
+        graph2.add_node(2, (2, 4, 0))
+        graph2.add_node(3, (2, 6, 0))
+        graph2.add_node(4, (4, 7, 0))
+        graph2.add_node(5, (6, 12, 0))
+        graph2.add_node(6, (4, 13, 0))
+        graph2.add_node(7, (5, 0, 0))
+        graph2.add_node(8, (7, 3, 0))
+        graph2.add_node(9, (8, 4, 0))
+        graph2.add_node(10, (1, 2, 0))
+        graph2.add_node(11, (1, 4, 0))
+        graph2.add_node(12, (2, 7, 0))
+        graph2.add_node(13, (4, 9, 0))
+        graph2.add_node(14, (6, 2, 0))
 
         graph2.add_edge(1, 2, 5)
         graph2.add_edge(2, 3, 5)
@@ -74,6 +86,9 @@ class TestGraphAlgo(unittest.TestCase):
         self.assertEqual(dict1, dict2)
         self.assertEqual(self.graph_algo.get_graph().all_in_edges_of_node(4), graph_algo2.get_graph().all_in_edges_of_node(4))
         self.assertNotEqual(self.graph_algo.get_graph(), graph_algo2.get_graph())
+        self.graph_algo2.save_to_json("Testing_Save_2")
+        graph_algo2.load_from_json("Testing_Save_2")
+        self.assertEqual(self.graph_algo2.get_graph().__dict__, self.graph_algo2.get_graph().__dict__)
 
     def test_shortest_path(self):
         self.assertEqual((16, [1, 5, 6, 11, 10, 12, 13]), self.graph_algo.shortest_path(1, 13))
@@ -90,6 +105,7 @@ class TestGraphAlgo(unittest.TestCase):
         self.assertEqual([[1, 2, 3], [4, 5, 6], [7], [8, 9], [10], [11], [12, 13, 14]], self.graph_algo2.connected_components())
         self.assertEqual([4, 5, 6], self.graph_algo2.connected_component(4))
         self.assertEqual([12, 13, 14], self.graph_algo2.connected_component(12))
+        self.assertEqual([], self.graph_algo2.connected_component(15))
 
 
 if __name__ == '__main__':
