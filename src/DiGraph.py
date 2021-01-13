@@ -1,18 +1,26 @@
 from src.NodeData import NodeData
+import copy
 
 
 class DiGraph:
     """This class represents a directed weighted graph with basic functions."""
 
-    def __init__(self):
+    def __init__(self, graph=None):
         """
         Constructor
         """
-        self.mc = 0
-        self.edge_size = 0
-        self.nodes_in_graph = {}
-        self.edges_in_node = {}
-        self.edges_out_node = {}
+        if graph is None:
+            self.mc = 0
+            self.edge_size = 0
+            self.nodes_in_graph = {}
+            self.edges_in_node = {}
+            self.edges_out_node = {}
+        elif isinstance(graph, DiGraph):
+            self.mc = copy.deepcopy(graph.mc)
+            self.edge_size = copy.deepcopy(graph.edge_size)
+            self.nodes_in_graph = copy.deepcopy(graph.nodes_in_graph)
+            self.edges_in_node = copy.deepcopy(graph.edges_in_node)
+            self.edges_out_node = copy.deepcopy(graph.edges_out_node)
 
     def v_size(self) -> int:
         """
@@ -172,3 +180,7 @@ class DiGraph:
             self.mc += 1
             self.edge_size -= 1
             return True
+
+    def __eq__(self, other):
+        if isinstance(other, DiGraph):
+            return self.edge_size == other.edge_size and self.v_size() == other.v_size() and self.nodes_in_graph == other.nodes_in_graph and self.edges_out_node == other.edges_out_node

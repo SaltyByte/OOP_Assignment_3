@@ -93,6 +93,10 @@ class TestDiGraph(unittest.TestCase):
         self.graph.remove_node(5)
         self.assertEqual({1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14}, self.graph.get_all_v().keys())
 
+    def test_copy(self):
+        graph = DiGraph(self.graph)
+        self.assertEqual(graph, self.graph)
+
 
 if __name__ == '__main__':
     unittest.main()
