@@ -85,7 +85,6 @@ class TestGraphAlgo(unittest.TestCase):
         dict2 = graph_algo2.get_graph().__dict__
         self.assertEqual(dict1, dict2)
         self.assertEqual(self.graph_algo.get_graph().all_in_edges_of_node(4), graph_algo2.get_graph().all_in_edges_of_node(4))
-        # self.assertNotEqual(self.graph_algo.get_graph(), graph_algo2.get_graph())
         self.graph_algo2.save_to_json("Testing_Save_2")
         graph_algo2.load_from_json("Testing_Save_2")
         self.assertEqual(self.graph_algo2.get_graph().__dict__, self.graph_algo2.get_graph().__dict__)
@@ -100,6 +99,7 @@ class TestGraphAlgo(unittest.TestCase):
         self.assertEqual((float('inf'), []), self.graph_algo.shortest_path(2, 1))
         self.assertEqual((2, [7, 4]), self.graph_algo.shortest_path(7, 4))
         self.assertEqual((float('inf'), []), self.graph_algo.shortest_path(0, 0))
+        self.assertEqual((0, [1]), self.graph_algo.shortest_path(1, 1))
         self.assertEqual((0, [10]), self.graph_algo.shortest_path(10, 10))
         self.assertEqual((float('inf'), []), self.graph_algo.shortest_path(7, 0))
         self.assertEqual((float('inf'), []), self.graph_algo.shortest_path(0, 7))
