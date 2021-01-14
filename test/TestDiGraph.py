@@ -57,7 +57,9 @@ class TestDiGraph(unittest.TestCase):
         self.assertEqual({}, graph.all_in_edges_of_node(3))
         self.assertEqual(14, self.graph.v_size())
         self.assertEqual(24, self.graph.e_size())
+        self.assertEqual(38, self.graph.get_mc())
         self.assertEqual(True, self.graph.remove_node(4))
+        self.assertEqual(39, self.graph.get_mc())
         self.assertEqual(True, self.graph.remove_edge(1, 2))
         self.graph.remove_edge(11, 10)
         self.assertEqual(False, self.graph.remove_node(15))
@@ -76,7 +78,7 @@ class TestDiGraph(unittest.TestCase):
         self.graph.add_edge(10, 99, 5)
         self.graph.add_edge(10, 99, 5)
         self.assertEqual(20, self.graph.e_size())
-        self.assertEqual(50, self.graph.get_mc())
+        self.assertEqual(45, self.graph.get_mc())
 
     def test_get_all_funcs(self):
         graph = DiGraph()

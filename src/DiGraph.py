@@ -139,6 +139,7 @@ class DiGraph:
             for src in list(in_dict):
                 # Removes the edge between src node to node_id
                 self.remove_edge(src, node_id)
+                self.mc -= 1
 
         if out_dict is not None:
             # Loop over all the dest nodes that node_id is directing on to,
@@ -146,6 +147,7 @@ class DiGraph:
             for dest in list(self.all_out_edges_of_node(node_id)):
                 # Removes the edge between node_id to dest node
                 self.remove_edge(node_id, dest)
+                self.mc -= 1
 
         # Deletes the node_id from the graph and increment mode counter by one
         del self.nodes_in_graph[node_id]
@@ -183,4 +185,10 @@ class DiGraph:
 
     def __eq__(self, other):
         if isinstance(other, DiGraph):
-            return self.edge_size == other.edge_size and self.v_size() == other.v_size() and self.nodes_in_graph == other.nodes_in_graph and self.edges_out_node == other.edges_out_node
+            return self.edge_size == other.edge_size and \
+                   self.v_size() == other.v_size() and \
+                   self.nodes_in_graph == other.nodes_in_graph and \
+                   self.edges_out_node == other.edges_out_node
+
+    def __repr__(self):
+        return f"|V|={self.v_size()} |E|={self.e_size()}"
